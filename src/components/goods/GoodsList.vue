@@ -1,63 +1,93 @@
 <template>
   <div class="goods-list">
-    <div class="goods-item">
-      <img
-        src="https://i0.hdslb.com/bfs/sycp/creative_img/201907/ff10637e7e84b75ca01a507d46068df3.jpg"
-        alt
-      />
-      <h1 class="title">单位的氛围sdasd</h1>
+    <!-- <router-link
+      class="goods-item"
+      v-for="item in goodslist"
+      :key="item.id"
+      :to="'/home/goodsinfo/' + item.id"
+      tag="div"
+    >
+      <img :src="item.img_url" alt />
+      <h1 class="title">{{item.title}}</h1>
       <div class="info">
         <p class="price">
-          <span class="now">￥899</span>
-          <span class="old">￥999</span>
+          <span class="now">￥{{item.sell_price}}</span>
+          <span class="old">￥{{item.market_price}}</span>
         </p>
         <p class="sell">
           <span>热卖中</span>
-          <span>剩60件</span>
+          <span>剩{{item.stock_quantity}}件</span>
+        </p>
+      </div>
+    </router-link>-->
+
+    <div class="goods-item" v-for="item in goodslist" :key="item.id" @click="goDeatil(item.id)">
+      <img :src="item.img_url" alt />
+      <h1 class="title">{{item.title}}</h1>
+      <div class="info">
+        <p class="price">
+          <span class="now">￥{{item.sell_price}}</span>
+          <span class="old">￥{{item.market_price}}</span>
+        </p>
+        <p class="sell">
+          <span>热卖中</span>
+          <span>剩{{item.stock_quantity}}件</span>
         </p>
       </div>
     </div>
 
-    <div class="goods-item">
-      <img
-        src="https://i0.hdslb.com/bfs/sycp/creative_img/201907/ff10637e7e84b75ca01a507d46068df3.jpg"
-        alt
-      />
-      <h1 class="title">单位的氛围sd萨达无大多哇所大多多多多多多多多多多多多多多asd</h1>
-      <div class="info">
-        <p class="price">
-          <span class="now">￥899</span>
-          <span class="old">￥999</span>
-        </p>
-        <p class="sell">
-          <span>热卖中</span>
-          <span>剩60件</span>
-        </p>
-      </div>
-    </div>
-
-    <div class="goods-item">
-      <img
-        src="https://i0.hdslb.com/bfs/sycp/creative_img/201907/ff10637e7e84b75ca01a507d46068df3.jpg"
-        alt
-      />
-      <h1 class="title">单位的氛围sdasd</h1>
-      <div class="info">
-        <p class="price">
-          <span class="now">￥899</span>
-          <span class="old">￥999</span>
-        </p>
-        <p class="sell">
-          <span>热卖中</span>
-          <span>剩60件</span>
-        </p>
-      </div>
-    </div>
+    <mt-button type="danger" size="large" @click="getMore">加载更多</mt-button>
   </div>
 </template>
 
 <script>
-export default {};
+import { Toast } from "mint-ui";
+
+export default {
+  data() {
+    return {
+      pageindex: 1,
+      goodslist: []
+    };
+  },
+  created() {
+    this.getGoodsList();
+  },
+  methods: {
+    getGoodsList() {
+      //获取商品列表的方法
+      this.$http
+        .get("api/getgoods?pageindex=" + this.pageindex)
+        .then(result => {
+          // console.log(result.body);
+          if (result.body.status === 0) {
+            // this.goodslist = result.body.message;
+            this.goodslist = this.goodslist.concat(result.body.message);
+          } else {
+            Toast("获取商品列表失败");
+          }
+        });
+    },
+    getMore() {
+      this.pageindex++;
+      this.getGoodsList();
+    },
+    goDeatil(id) {
+      //使用js的方式进行路由导航
+
+      //this.$route  是路由参数对象（params,query）
+      //this.$router  是路由导航对象,用js实现url跳转
+      //1. 最简单的，字符串
+      this.$router.push('/home/goodsinfo/' + id);
+
+      //2. 对象
+      // this.$router.push({ path: "'/home/goodsinfo/' + id" });
+
+      //3.  命名路由
+      // this.$router.push({ name: "goodsinfo", params: id });
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
