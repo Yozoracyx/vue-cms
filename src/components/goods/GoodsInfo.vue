@@ -23,7 +23,7 @@
           </p>
           <p>
             购买数量 :
-            <numbox></numbox>
+            <numbox @getcount="getSelectedCount" :max="goodsinfo.stock_quantity"></numbox>
           </p>
           <p>
             <mt-button type="primary" size="small">立即购买</mt-button>
@@ -62,7 +62,8 @@ export default {
       id: this.$route.params.id,
       lunbotu: [],
       goodsinfo: {},
-      ballFlag: false
+      ballFlag: false,
+      selectCount: 1
     };
   },
   created() {
@@ -106,6 +107,16 @@ export default {
     addToShopCar() {
       //添加到购物车
       this.ballFlag = !this.ballFlag;
+      // 要加入到购物车中的数据
+      var goodsinfo = {
+        id: this.id,
+        count: this.selectCount,
+        price: this.goodsinfo.sell_price,
+        selected: true
+      };
+
+      //调用 store 中的 mutations 将商品加入购物车
+      this.$store.commit("addToCar",goodsinfo);
     },
     beforeEnter(el) {
       el.style.transform = "translate(0,0)";
@@ -126,14 +137,17 @@ export default {
       const xDist = badgePosition.left - ballPosition.left;
       const yDist = badgePosition.top - ballPosition.top;
 
-
       el.style.transform = "translate(" + xDist + "px," + yDist + "px)";
-      el.style.transition = "all 1s cubic-bezier(.4,-0.31,1,.72) ";
-      done();      
-
+      el.style.transition = "all 0.7s cubic-bezier(.4,-0.31,1,.72) ";
+      done();
     },
     afterEnter(el) {
       this.ballFlag = !this.ballFlag;
+    },
+    getSelectedCount(count) {
+      // 子组件传递 数量值 给父组件
+      this.selectCount = count;
+      console.log(this.selectCount);
     }
   },
   components: {
